@@ -1,10 +1,8 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.model.Fornecedor;
 import com.example.demo.service.FornecedorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,20 +14,30 @@ public class FornecedorController {
     private FornecedorService fornecedorService;
 
     @PostMapping
-    public ResponseEntity<Fornecedor> criarFornecedor(@RequestBody Fornecedor fornecedor) {
-        Fornecedor novoFornecedor = fornecedorService.salvar(fornecedor);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoFornecedor);
+    public ResponseEntity<?> criarFornecedor(@RequestBody Fornecedor fornecedor) {
+        try {
+            return ResponseEntity.status(201).body(fornecedorService.salvar(fornecedor));
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Fornecedor> atualizarFornecedor(@PathVariable Long id, @RequestBody Fornecedor fornecedor) {
-        Fornecedor fornecedorAtualizado = fornecedorService.atualizar(id, fornecedor);
-        return ResponseEntity.ok(fornecedorAtualizado);
+    public ResponseEntity<?> atualizarFornecedor(@PathVariable Long id, @RequestBody Fornecedor fornecedor) {
+        try {
+            return ResponseEntity.ok(fornecedorService.atualizar(id, fornecedor));
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarFornecedor(@PathVariable Long id) {
-        fornecedorService.deletar(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletarFornecedor(@PathVariable Long id) {
+        try {
+            fornecedorService.deletar(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 }

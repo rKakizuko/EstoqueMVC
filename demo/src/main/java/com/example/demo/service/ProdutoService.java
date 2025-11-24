@@ -27,14 +27,19 @@ public class ProdutoService {
 
     public Produto salvar(Produto produto) {
         Categoria categoria = categoriaRepository.findById(produto.getCategoria().getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não encontrada."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Categoria inválida ou não encontrada."
+                ));
 
         Fornecedor fornecedor = fornecedorRepository.findById(produto.getFornecedor().getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Fornecedor inválido ou não encontrado."
+                ));
 
         produto.setCategoria(categoria);
         produto.setFornecedor(fornecedor);
-
         return produtoRepository.save(produto);
     }
 
@@ -44,17 +49,26 @@ public class ProdutoService {
 
     public Produto buscarPorId(Long id) {
         return produtoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto com ID " + id + " não encontrado."
+                ));
     }
 
     public Produto atualizar(Long id, Produto produtoAtualizado) {
         return produtoRepository.findById(id).map(produtoExistente -> {
 
             Categoria categoria = categoriaRepository.findById(produtoAtualizado.getCategoria().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não encontrada."));
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Categoria inválida ou não encontrada."
+                    ));
 
             Fornecedor fornecedor = fornecedorRepository.findById(produtoAtualizado.getFornecedor().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor não encontrado."));
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Fornecedor inválido ou não encontrado."
+                    ));
 
             produtoExistente.setNome(produtoAtualizado.getNome());
             produtoExistente.setDescricao(produtoAtualizado.getDescricao());
@@ -64,17 +78,29 @@ public class ProdutoService {
             produtoExistente.setFornecedor(fornecedor);
 
             return produtoRepository.save(produtoExistente);
-        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado para atualização."));
+        }).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Produto com ID " + id + " não encontrado para atualização."
+        ));
     }
 
     public Produto atualizarEstoque(Long id, Integer novoEstoque) {
         return produtoRepository.findById(id).map(produto -> {
             produto.setQuantidadeEstoque(novoEstoque);
             return produtoRepository.save(produto);
-        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado para atualização de estoque."));
+        }).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Produto com ID " + id + " não encontrado para atualização de estoque."
+        ));
     }
 
     public void deletar(Long id) {
+        produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto com ID " + id + " não encontrado."
+                ));
+
         produtoRepository.deleteById(id);
     }
 
